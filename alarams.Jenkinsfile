@@ -31,7 +31,7 @@ pipeline {
 
         stage('Approval') {
             when { expression { params.autoApprove == false  } }
-             stages {
+             steps {
                 script {
                     def plan = readFile 'tfplan.txt'
                     input message: "Do you want to apply the plan?",
