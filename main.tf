@@ -18,6 +18,10 @@ terraform {
 
 provider "aws" {
   region  = var.region
+  assume_role {
+    role_arn     = "arn:aws:iam::700935310038:role/terraform-jenkins-roles"
+    session_name = "SESSION_NAME"
+  }
 }
 
 resource "aws_sns_topic" "alarms_sns" {
