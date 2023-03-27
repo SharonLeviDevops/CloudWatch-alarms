@@ -14,7 +14,7 @@ pipeline {
                 sh 'terraform workspace select ${workspace}'  // check workspace existence, create if new needed
                 sh 'terraform init -input=false -backend-config="key=${params.env}-${params.region}.tfstate"'
 
-                steps {
+                script {
                     if (params.workspace == 'dev') {
                         sh "terraform apply -input=false -var-file=dev-${params.region}.tfvars"
                     } else if (params.workspace == 'prod') {
