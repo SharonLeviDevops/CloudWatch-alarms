@@ -7,19 +7,25 @@ terraform {
   }
 
   backend "s3" {
-    ...
+    bucket = "cloudwatch-project"
+    key    = "sharon_levi.pem"
+    region = "us-east-1"
+    workspace_key_prefix = "tf_alarm"
   }
 
   required_version = ">= 1.2.0"
 }
 
 provider "aws" {
-  region  = '...'
+  region  = var.region
 }
 
+resource "aws_sns_topic" "alarms_sns" {
+  name = "alarm-sns-topic-${var.workspace}"
+}
 
 resource "aws_cloudwatch_metric_alarm" "alarm1" {
-  alarm_name                = "alarm1-${var.env}-${var.region}"
+  alarm_name                = "alarm1-${var.workspace}-${var.region}"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "2"
   metric_name               = "CPUUtilization"
@@ -29,15 +35,15 @@ resource "aws_cloudwatch_metric_alarm" "alarm1" {
   threshold                 = "80"
   alarm_description         = "This metric monitors ec2 cpu utilization"
   insufficient_data_actions = []
-  alarm_actions       = [...]
+  alarm_actions = var.workspace == ["prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []]
   dimensions = {
-    InstanceId = '...'
+    InstanceId = 'i-06d3af03a1419454b'
   }
 }
 
 
 resource "aws_cloudwatch_metric_alarm" "alarm2" {
-  alarm_name                = "alarm1-${var.env}-${var.region}"
+  alarm_name                = "alarm1-${var.workspace}-${var.region}"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "2"
   metric_name               = "CPUUtilization"
@@ -47,15 +53,15 @@ resource "aws_cloudwatch_metric_alarm" "alarm2" {
   threshold                 = "80"
   alarm_description         = "This metric monitors ec2 cpu utilization"
   insufficient_data_actions = []
-  alarm_actions       = [...]
+  alarm_actions = var.workspace == ["prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []]
   dimensions = {
-    InstanceId = '...'
+    InstanceId = 'i-06d3af03a1419454b'
   }
 }
 
 resource "aws_cloudwatch_metric_alarm" "alarm3" {
   count = var.includeAlarm3inRegion ? 1 : 0
-  alarm_name                = "alarm3-${var.env}-${var.region}"
+  alarm_name                = "alarm3-${var.workspace}-${var.region}"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "2"
   metric_name               = "CPUUtilization"
@@ -65,9 +71,9 @@ resource "aws_cloudwatch_metric_alarm" "alarm3" {
   threshold                 = "80"
   alarm_description         = "This metric monitors ec2 cpu utilization"
   insufficient_data_actions = []
-  alarm_actions       = [...]
+  alarm_actions = var.workspace == ["prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []]
   dimensions = {
-    InstanceId = '...'
+    InstanceId = 'i-06d3af03a1419454b'
   }
 }
 

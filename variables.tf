@@ -1,4 +1,4 @@
-variable "env" {
+variable "workspace" {
   description = "Environment"
   type        = string
 }
