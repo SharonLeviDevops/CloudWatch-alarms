@@ -18,12 +18,6 @@ terraform {
 
 provider "aws" {
   region  = "us-east-2"
-  shared_config_files = ["~/.aws/config"]
-  shared_credentials_files = ["~/.aws/credentials"]
-  profile = "default"
-  assume_role {
-    role_arn     = "arn:aws:iam::700935310038:role/terraform-jenkins-roles"
-  }
 }
 
 resource "aws_sns_topic" "alarms_sns" {
