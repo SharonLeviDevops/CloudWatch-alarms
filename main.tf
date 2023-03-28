@@ -38,7 +38,7 @@ resource "aws_cloudwatch_metric_alarm" "alarm1" {
   threshold                 = "80"
   alarm_description         = "This metric monitors ec2 cpu utilization"
   insufficient_data_actions = []
-  alarm_actions = var.workspace == ["prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []]
+  alarm_actions = var.workspace == "prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []
   dimensions = {
     InstanceId = "i-06d3af03a1419454b"
   }
@@ -56,7 +56,7 @@ resource "aws_cloudwatch_metric_alarm" "alarm2" {
   threshold                 = "80"
   alarm_description         = "This metric monitors ec2 cpu utilization"
   insufficient_data_actions = []
-  alarm_actions = var.workspace == ["prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []]
+  alarm_actions = var.workspace == "prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []
   dimensions = {
     InstanceId = "i-06d3af03a1419454b"
   }
@@ -74,7 +74,7 @@ resource "aws_cloudwatch_metric_alarm" "alarm3" {
   threshold                 = "80"
   alarm_description         = "This metric monitors ec2 cpu utilization"
   insufficient_data_actions = []
-  alarm_actions = var.workspace == ["prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []]
+  alarm_actions = var.workspace == "prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []
   dimensions = {
     InstanceId = "i-06d3af03a1419454b"
   }
