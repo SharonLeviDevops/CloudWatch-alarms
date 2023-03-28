@@ -50,5 +50,14 @@ pipeline {
         always {
             archiveArtifacts artifacts: 'tfplan.txt'
         }
+
+        success {
+            echo "Pipeline succeeded!"
+        }
+
+        failure {
+            echo "Pipeline failed!"
+            sh "terraform destroy -auto-approve"
+        }
     }
 }
