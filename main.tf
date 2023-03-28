@@ -17,7 +17,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = "us-east-1"
+  region  = "us-east-2"
   profile = "terraform-jenkins-project"
   assume_role {
     role_arn     = "arn:aws:iam::700935310038:role/terraform-jenkins-roles"
