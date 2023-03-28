@@ -14,7 +14,7 @@ pipeline {
             steps {
                 sh 'terraform init -input=false'
                 sh "terraform workspace new ${params.workspace}-${params.region}"
-                sh 'terraform init -input=false -backend-config="key=${params.workspace}-${params.region}.tfstate"'
+                sh "terraform init -input=false -backend-config=\"key=${params.workspace}-${params.region}.tfstate\""
                 sh "terraform workspace select ${params.workspace}-${params.region}"
                 sh "terraform plan -input=false -out tfplan_out --var-file=${params.workspace}-${params.region}.tfvars"
                 sh 'terraform show -no-color tfplan_out > tfplan.txt'
