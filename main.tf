@@ -23,6 +23,7 @@ provider "aws" {
   }
 }
 
+
 resource "aws_sns_topic" "alarms_sns" {
   name = "alarm-sns-topic-${var.workspace}"
 }
