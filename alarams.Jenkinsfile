@@ -12,6 +12,7 @@ pipeline {
     stages {
         stage('Plan') {
             steps {
+                sh  'echo "Region: ${params.region}, Env: ${params.env}"'
                 sh 'terraform init -input=false'
                 sh "terraform workspace select ${params.workspace}"
                 sh 'terraform init -input=false -backend-config="key=${params.region}-${params.env}.tfstate"'
