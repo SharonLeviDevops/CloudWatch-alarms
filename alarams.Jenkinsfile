@@ -22,7 +22,7 @@ pipeline {
                             terraform workspace new ${params.workspace}
                         fi
                     """
-                sh "terraform init -input=false -backend-config=\"key=${params.workspace}-${params.region}.tfstate\" -reconfigure"
+                sh "terraform init -input=false -backend-config=\"key=${params.workspace}-${params.region}.tfstate\" -migrate-state"
                 sh "terraform plan -input=false -out tfplan_out --var-file=regions/${params.region}-${params.workspace}.tfvars"
                 sh 'terraform show -no-color tfplan_out > tfplan.txt'
             }
