@@ -13,7 +13,15 @@ pipeline {
         stage('Plan') {
             steps {
                 sh 'terraform init -input=false'
-                sh "terraform workspace select ${params.workspace} || terraform workspace new ${params.workspace}"
+                sh """
+                        if terraform workspace list | grep -q ${params.workspace}; then
+                            echo "Workspace '${params.workspace}' already exists"
+                            terraform workspace select ${params.workspace}
+                        else
+                            echo "Creating workspace '${params.workspace}'"
+                            terraform workspace new ${params.workspace}
+                        fi
+                    """
                 sh "terraform init -input=false -backend-config=\"key=${params.workspace}-${params.region}.tfstate\" -reconfigure"
                 sh "terraform plan -input=false -out tfplan_out --var-file=regions/${params.region}-${params.workspace}.tfvars"
                 sh 'terraform show -no-color tfplan_out > tfplan.txt'
