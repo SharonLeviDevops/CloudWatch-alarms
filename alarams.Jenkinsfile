@@ -12,26 +12,10 @@ pipeline {
     stages {
         stage('Plan') {
             steps {
-                sh  'echo "Region: ${params.region}, Env: ${params.env}"'
                 sh 'terraform init -input=false'
-                sh "terraform workspace select ${params.workspace}"
-                sh 'terraform init -input=false -backend-config="key=${params.region}-${params.env}.tfstate"'
-                sh "terraform plan -input=false -out tfplan_out --var-file=${params.region}-${params.env}.tfvars"
-                sh 'terraform show -no-color tfplan_out > tfplan.txt'
-
-                script {
-                    if (params.workspace == 'dev') {
-                        sh "terraform apply -input=false -var-file=dev-${params.region}.tfvars"
-                    } else if (params.workspace == 'prod') {
-                        if (params.region == 'us-east-1') {
-                            sh "terraform apply -input=false -var-file=prod-${params.region}.tfvars -target=aws_cloudwatch_metric_alarm.alarm3"
-                        } else {
-                            sh "terraform apply -input=false -var-file=prod-${params.region}.tfvars"
-                        }
-                    }
-                }
-
-                sh 'terraform plan -input=false -out tfplan_out --var-file=${params.env}-${params.region}.tfvars'
+                sh "terraform workspace select ${params.workspace} || terraform workspace new ${params.workspace}"
+                sh "terraform init -input=false -backend-config=\"key=${params.workspace}-${params.region}.tfstate\" -reconfigure"
+                sh "terraform plan -input=false -out tfplan_out --var-file=regions/${params.region}-${params.workspace}.tfvars"
                 sh 'terraform show -no-color tfplan_out > tfplan.txt'
             }
         }
