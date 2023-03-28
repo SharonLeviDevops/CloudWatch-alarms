@@ -13,7 +13,7 @@ pipeline {
         stage('Plan') {
             steps {
                 sh 'terraform init -input=false'
-                sh "terraform workspace select ${params.workspace} || terraform workspace new ${params.workspace} || terraform apply -var env=${params.env} -var region=${params.region}"
+                sh "terraform workspace select ${params.workspace}"
                 sh 'terraform init -input=false -backend-config="key=${params.region}-${params.env}.tfstate"'
                 sh "terraform plan -input=false -out tfplan_out --var-file=${params.region}-${params.env}.tfvars"
                 sh 'terraform show -no-color tfplan_out > tfplan.txt'
