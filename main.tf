@@ -5,14 +5,7 @@ terraform {
       version = "4.16"
     }
   }
-  required_version = ">= 1.2.0"
- }
-  provider "aws" {
-  region  = var.region
-  assume_role {
-    role_arn     = "arn:aws:iam::700935310038:role/terraform-jenkins-roles"
-  }
- }
+
   backend "s3" {
     bucket = "cloudwatch-project"
     key    = "sharon_levi.pem"
@@ -20,6 +13,15 @@ terraform {
     workspace_key_prefix = "tf_alarm"
   }
 
+  required_version = ">= 1.2.0"
+}
+
+provider "aws" {
+  region  = var.region
+  assume_role {
+    role_arn     = "arn:aws:iam::700935310038:role/terraform-jenkins-roles"
+  }
+}
 
 resource "aws_sns_topic" "alarms_sns" {
   name = "alarm-sns-topic-${var.workspace}"
