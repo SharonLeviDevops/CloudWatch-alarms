@@ -13,6 +13,7 @@ pipeline {
         stage('Plan') {
             steps {
                 sh 'terraform init -input=false'
+                 sh 'terraform refresh'
                 sh """
                         if terraform workspace list | grep -q ${params.workspace}; then
                             echo "Workspace '${params.workspace}' already exists"
