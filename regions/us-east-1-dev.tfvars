@@ -3,4 +3,4 @@ alarm2InstanceId = "i-06d3af03a1419454b"
 alarm3InstanceId = "i-06d3af03a1419454b"
 workspace = "dev"
 region = "us-east-1"
-sendMail = true
+sendMail = false
