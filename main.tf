@@ -18,6 +18,7 @@ terraform {
 
 provider "aws" {
   region  = "us-east-2"
+  shared_credentials_files  = ["%USERPROFILE%/.aws/credentials"]
   profile = "terraform-jenkins-project"
   assume_role {
     role_arn     = "arn:aws:iam::700935310038:role/terraform-jenkins-roles"
