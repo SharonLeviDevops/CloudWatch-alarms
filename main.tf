@@ -43,7 +43,7 @@ resource "aws_cloudwatch_metric_alarm" "alarm1" {
 
 
 resource "aws_cloudwatch_metric_alarm" "alarm2" {
-  alarm_name                = "alarm1-${var.workspace}-${var.region}"
+  alarm_name                = "alarm2-${var.workspace}-${var.region}"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "2"
   metric_name               = "CPUUtilization"
