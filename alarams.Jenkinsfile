@@ -3,9 +3,6 @@ pipeline {
     options {
         withAWS(credentials: 'aws', region: 'us-east-1')
     }
-    environment {
-        REGIONS = 'us-east-1,us-west-1,eu-central-1'
-    }
     parameters {
         choice(name: 'workspace', choices: ['dev', 'prod'])
         booleanParam(name: 'autoApprove', defaultValue: false)
@@ -24,15 +21,8 @@ pipeline {
                         terraform workspace new ${params.workspace}
                     fi
                 """
-                sh "terraform init -no-color -input=false -reconfigure \
-                    -backend-config=\"key=${params.workspace}${params.workspace == 'prod' ? '-us-east-1.tfstate' : '.tfstate'}\" \
-                    -backend-config=\"key=${params.workspace}${params.workspace == 'prod' ? '-us-west-1.tfstate' : '.tfstate'}\" \
-                    -backend-config=\"key=${params.workspace}${params.workspace == 'prod' ? '-eu-central-1.tfstate' : '.tfstate'}\""
-
-                sh "terraform plan -no-color -input=false -out tfplan_out \
-                      --var-file=regions/us-east-1-prod.tfvars \
-                      --var-file=regions/us-west-1-prod.tfvars \
-                      --var-file=regions/eu-central-1-prod.tfvars"
+                sh "terraform init -no-color -input=false -re -backend-config='key=${params.workspace}${params.workspace == 'prod' ? "-${params.workspace}" : ""}.tfstate'"
+                sh "terraform plan -no-color -input=false -out tfplan_out --var-file=/${params.workspace}.tfvars"
                 sh 'terraform show -no-color tfplan_out > tfplan.txt'
             }
         }
@@ -55,14 +45,10 @@ pipeline {
         stage('Apply') {
             steps {
                 script {
-                    if (params.workspace == 'dev') {
-                        sh 'terraform apply -input=false tfplan_out'
-                    } else if (params.workspace == 'prod') {
-                        if (params.region == 'us-east-1' || params.region == 'us-west-1' || params.region == 'eu-central-1') {
-                            sh 'terraform apply -input=false -target=aws_cloudwatch_metric_alarm.alarm1 -target=aws_cloudwatch_metric_alarm.alarm2 tfplan_out'
-                            sh 'terraform apply -input=false -target=aws_cloudwatch_metric_alarm.alarm3 -var region=us-east-1 tfplan_out'
-                        } else {
-                            echo 'Invalid region specified'
+                    def regions = (params.workspace == 'dev') ? ['us-east-1'] : ['us-east-1', 'us-west-1', 'eu-central-1']
+                    for (region in regions) {
+                        withEnv(["AWS_REGION=${region}"]) {
+                            sh 'terraform apply -input=false -var "region=${region}" tfplan_out'
                         }
                     }
                 }
