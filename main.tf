@@ -60,8 +60,8 @@ resource "aws_cloudwatch_metric_alarm" "alarm2" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "alarm3" {
-  count                     = var.includeAlarm3inRegion ? 1 : 0
   alarm_name                = "alarm3-${var.workspace}-${var.region}"
+  count                     = var.includeAlarm3inRegion ? 1 : 0
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "2"
   metric_name               = "CPUUtilization"
