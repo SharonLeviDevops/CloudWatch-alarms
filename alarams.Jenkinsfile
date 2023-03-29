@@ -1,15 +1,20 @@
 pipeline {
     agent any
-    options {
-        withAWS(credentials: 'aws', region: 'us-east-1')
-    }
+
     parameters {
-        choice(name: 'workspace', choices: ['dev', 'prod'])
+        choice(name: 'workspace',  choices: ['dev', 'prod'])
+        choice(name: 'region', choices: ['us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'eu-central-1', 'eu-west-1', 'eu-west-2', 'eu-west-3', 'eu-north-1'])
         booleanParam(name: 'autoApprove', defaultValue: false)
     }
 
     stages {
         stage('Plan') {
+            when {
+                expression {
+                    params.workspace == 'prod' &&
+                    params.region in ['us-east-1', 'us-west-1', 'eu-central-1']
+                }
+            }
             steps {
                 sh 'terraform init -input=false'
                 sh """
@@ -21,47 +26,28 @@ pipeline {
                         terraform workspace new ${params.workspace}
                     fi
                 """
-                sh "terraform init -no-color -input=false -reconfigure -backend-config='key=${params.workspace}${params.workspace == 'prod' ? "-${params.workspace}" : ""}.tfstate'"
-                sh "terraform plan -no-color -input=false -out tfplan_out --var-file=/${params.workspace}.tfvars"
+                sh 'terraform init -input=false -backend-config="key=${params.env}-${params.region}.tfstate"'
+                sh "terraform plan -input=false -out tfplan_out --var-file=${params.env}-${params.region}.tfvars"
                 sh 'terraform show -no-color tfplan_out > tfplan.txt'
             }
         }
 
-        stage('Approval') {
+        stage('Apply') {
             when {
                 expression {
-                    params.autoApprove == false
+                    params.workspace == 'prod' &&
+                    params.region in ['us-east-1', 'us-west-1', 'eu-central-1']
                 }
             }
             steps {
-                script {
-                    def plan = readFile 'tfplan.txt'
-                    input message: 'Do you want to apply the plan?',
-                          parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
-                }
-            }
-        }
-
-        stage('Apply') {
-            steps {
-                script {
-                    def regions = (params.workspace == 'dev') ? ['us-east-1'] : ['us-east-1', 'us-west-1', 'eu-central-1']
-                    for (region in regions) {
-                        withEnv(["AWS_REGION=${region}"]) {
-                            sh 'terraform apply -input=false -var "region=${region}" tfplan_out'
-                        }
-                    }
-                }
+                sh "terraform apply -input=false tfplan_out"
             }
         }
     }
+
     post {
         always {
             archiveArtifacts artifacts: 'tfplan.txt'
-        }
-
-        success {
-            echo "Pipeline succeeded!"
         }
     }
 }
