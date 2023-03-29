@@ -60,7 +60,7 @@ resource "aws_cloudwatch_metric_alarm" "alarm2" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "alarm3" {
-  count = var.includeAlarm3inRegion ? 1 : 0
+  count                     = var.includeAlarm3inRegion ? 1 : 0
   alarm_name                = "alarm3-${var.workspace}-${var.region}"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
   evaluation_periods        = "2"
@@ -71,15 +71,9 @@ resource "aws_cloudwatch_metric_alarm" "alarm3" {
   threshold                 = "80"
   alarm_description         = "This metric monitors ec2 cpu utilization"
   insufficient_data_actions = []
-  alarm_actions = var.workspace == "prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []
-  dimensions = {
+  alarm_actions             = var.workspace == "prod" && var.sendMail ? [aws_sns_topic.alarms_sns.arn] : []
+  dimensions                = {
     InstanceId = "i-06d3af03a1419454b"
   }
-    dynamic "region" {
-      for_each = var.workspace == "prod" ? toset(["us-east-1", "us-west-1", "eu-central-1"]) : toset(["us-east-1"])
-      content {
-        region_name = region.value
-      }
-    }
 }
 
