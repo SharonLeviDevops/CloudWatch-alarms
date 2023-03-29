@@ -27,6 +27,7 @@ pipeline {
                             sh "terraform init -no-color -input=false -reconfigure -backend-config='key=${region}-${params.workspace}.tfstate'"
                             sh "terraform plan -no-color -input=false -out tfplan_out --var-file=regions/${region}-${params.workspace}.tfvars"
                             sh 'terraform show -no-color tfplan_out > tfplan.txt'
+                            sh "terraform apply -no-color -input=false tfplan_out"
                         }
                     }
                 }
@@ -45,7 +46,8 @@ pipeline {
 
         stage('Apply') {
             steps {
-                sh "terraform apply -no-color -input=false tfplan_out"
+                //sh "terraform apply -no-color -input=false tfplan_out"
+                sh 'echo "heelo"'
             }
         }
     }
