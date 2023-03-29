@@ -39,23 +39,22 @@ pipeline {
             }
         }
 
-            stage('Apply') {
-                steps {
-                    script {
-                        if (params.workspace == 'dev') {
-                            sh "terraform apply -input=false tfplan_out"
-                        } else if (params.workspace == 'prod') {
-                            if (params.region == 'us-east-1' || params.region == 'us-west-1' || params.region == 'eu-central-1') {
-                                sh "terraform apply -input=false -target=aws_cloudwatch_metric_alarm.alarm1 -target=aws_cloudwatch_metric_alarm.alarm2 tfplan_out"
-                                sh "terraform apply -input=false -target=aws_cloudwatch_metric_alarm.alarm3 -var region=us-east-1 tfplan_out"
-                            } else {
-                                echo "Invalid region specified"
-                            }
+       stage('Apply') {
+            steps {
+                script {
+                    if (params.workspace == 'dev') {
+                        sh "terraform apply -input=false tfplan_out"
+                    } else if (params.workspace == 'prod') {
+                        if (params.region == 'us-east-1' || params.region == 'us-west-1' || params.region == 'eu-central-1') {
+                            sh "terraform apply -input=false -target=aws_cloudwatch_metric_alarm.alarm1 -target=aws_cloudwatch_metric_alarm.alarm2 tfplan_out"
+                            sh "terraform apply -input=false -target=aws_cloudwatch_metric_alarm.alarm3 -var region=us-east1plan_out"
+                        } else {
+                            echo "Invalid region specified"
+                        }
+                    }
+                }
             }
-        }
-    }
 }
-
     post {
         always {
             archiveArtifacts artifacts: 'tfplan.txt'
