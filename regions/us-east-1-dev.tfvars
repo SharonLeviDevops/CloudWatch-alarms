@@ -4,3 +4,4 @@ alarm3InstanceId = "i-06d3af03a1419454b"
 workspace = "dev"
 region = "us-east-1"
 sendMail = false
+includeAlarm3inRegion = true

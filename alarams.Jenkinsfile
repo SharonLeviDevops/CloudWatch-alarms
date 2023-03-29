@@ -5,7 +5,7 @@ pipeline {
     }
     parameters {
         choice(name: 'workspace',  choices: ['dev', 'prod'])
-        choice(name: 'region', choices: ['us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'eu-central-1', 'eu-west-1', 'eu-west-2', 'eu-west-3', 'eu-north-1'])
+        choice(name: 'region', choices: ['us-east-1', 'us-west-1', 'eu-central-1'], description: 'Regions to deploy in (prod only)')
         booleanParam(name: 'autoApprove', defaultValue: false)
     }
 
@@ -22,7 +22,7 @@ pipeline {
                             terraform workspace new ${params.workspace}
                         fi
                     """
-                sh 'terraform init -no-color -input=false -reconfigure -backend-config=\'key=${params.workspace}-${params.region}.tfstate\''
+                sh 'terraform init -no-color -input=false -reconfigure -backend-config=\'key=${params.workspace}${params.workspace == 'prod' ? "-${params.region}" : ""}.tfstate\''
                 sh "terraform plan -no-color -input=false -out tfplan_out --var-file=regions/${params.region}-${params.workspace}.tfvars"
                 sh 'terraform show -no-color tfplan_out > tfplan.txt'
             }

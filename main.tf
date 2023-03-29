@@ -75,5 +75,11 @@ resource "aws_cloudwatch_metric_alarm" "alarm3" {
   dimensions = {
     InstanceId = "i-06d3af03a1419454b"
   }
+    dynamic "region" {
+      for_each = var.workspace == "prod" ? toset(["us-east-1", "us-west-1", "eu-central-1"]) : toset(["us-east-1"])
+      content {
+        region_name = region.value
+      }
+    }
 }
 
