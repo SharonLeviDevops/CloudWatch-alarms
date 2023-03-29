@@ -21,7 +21,7 @@ pipeline {
                         terraform workspace new ${params.workspace}
                     fi
                 """
-                sh "terraform init -no-color -input=false -re -backend-config='key=${params.workspace}${params.workspace == 'prod' ? "-${params.workspace}" : ""}.tfstate'"
+                sh "terraform init -no-color -input=false -reconfigure -backend-config='key=${params.workspace}${params.workspace == 'prod' ? "-${params.workspace}" : ""}.tfstate'"
                 sh "terraform plan -no-color -input=false -out tfplan_out --var-file=/${params.workspace}.tfvars"
                 sh 'terraform show -no-color tfplan_out > tfplan.txt'
             }
