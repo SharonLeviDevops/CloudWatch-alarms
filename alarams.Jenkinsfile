@@ -9,6 +9,9 @@ pipeline {
             steps {
                 script {
                     def regions = ['us-east-1', 'us-west-1', 'eu-central-1']
+                    if (params.workspace == 'dev') {
+                        regions = ['us-east-1']
+                    }
                     for (region in regions) {
                         withAWS(credentials: 'aws', region: region) {
                             sh 'terraform init -input=false'
@@ -21,7 +24,7 @@ pipeline {
                                     terraform workspace new ${params.workspace}
                                 fi
                             """
-                            sh 'terraform init -no-color -input=false -reconfigure -backend-config=\'key=${params.workspace}-${region}.tfstate\''
+                            sh "terraform init -no-color -input=false -reconfigure -backend-config='key=${region}-${params.workspace}.tfstate'"
                             sh "terraform plan -no-color -input=false -out tfplan_out --var-file=regions/${region}-${params.workspace}.tfvars"
                             sh 'terraform show -no-color tfplan_out > tfplan.txt'
                         }
@@ -42,7 +45,7 @@ pipeline {
 
         stage('Apply') {
             steps {
-                sh "terraform apply -input=false tfplan_out"
+                sh "terraform apply -no-color -input=false tfplan_out"
             }
         }
     }
