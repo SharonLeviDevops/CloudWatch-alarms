@@ -24,8 +24,14 @@ pipeline {
                         terraform workspace new ${params.workspace}
                     fi
                 """
-                sh "terraform init -no-color -input=false -reconfigure -backend-config='key=${params.workspace}${params.workspace == 'prod' ? "-${env.REGIONS}" : ""}.tfstate'"
-                sh "terraform plan -no-color -input=false -out tfplan_out --var-file=regions/${env.REGIONS}-${params.workspace}.tfvars"
+                sh "terraform init -no-color -input=false -reconfigure \
+                     -backend-config="key=${params.workspace}${params.workspace == 'prod' ? '-us-east-1.tfstate' : '.tfstate'}" \
+                     -backend-config="key=${params.workspace}${params.workspace == 'prod' ? '-us-west-1.tfstate' : '.tfstate'}" \
+                     -backend-config="key=${params.workspace}${params.workspace == 'prod' ? '-eu-central-1.tfstate' : '.tfstate'}""
+                sh "terraform plan -no-color -input=false -out tfplan_out \
+                      --var-file=regions/us-east-1-prod.tfvars \
+                      --var-file=regions/us-west-1-prod.tfvars \
+                      --var-file=regions/eu-central-1-prod.tfvars"
                 sh 'terraform show -no-color tfplan_out > tfplan.txt'
             }
         }
