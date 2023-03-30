@@ -32,6 +32,8 @@ tf_alarm/
 - `regions` directory: contains .tfvars files with per-region variable assignments
 - `alarms.Jenkinsfile`: an almost ready-to-use Jenkinsfile to integrate the alarms pipeline in your Jenkins server
 
+## Diagram
+<img src="https://github.com/SharonLeviDevops/CloudWatch-alarms/blob/main/Diagram.jpg" alt="Alt text">
 ## Usage
 
 1. Clone the repository:
