@@ -34,6 +34,8 @@ tf_alarm/
 
 ## Diagram
 <img src="https://github.com/SharonLeviDevops/CloudWatch-alarms/blob/main/Diagram.jpg" alt="Alt text">
+
+
 ## Usage
 
 1. Clone the repository:
